@@ -17,7 +17,7 @@ namespace CookieClickerBot
             using (var driver = new ChromeDriver())
             {
                 driver.Navigate().GoToUrl("https://orteil.dashnet.org/cookieclicker/");
-                Thread.Sleep(1000);
+                Thread.Sleep(5000);
                 driver.FindElementById("prefsButton").Click();
                 Thread.Sleep(1000);
                 driver.FindElementByLinkText("Import save").Click();
