@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
@@ -16,24 +17,34 @@ namespace CookieClickerBot
             using (var driver = new ChromeDriver())
             {
                 driver.Navigate().GoToUrl("https://orteil.dashnet.org/cookieclicker/");
-                Thread.Sleep(5000);
-                //var lineOutput = File.ReadAllLines("Cookies.txt");
-                //foreach (var line in lineOutput)
-                //{
-                //    var cookieStrings = line.Split(",");
-                //    var cookie = new Cookie(cookieStrings[2], cookieStrings[4], cookieStrings[0], cookieStrings[3], Convert.ToDateTime(cookieStrings[1]));
-                //    driver.Manage().Cookies.AddCookie(cookie);
-                //}
+                Thread.Sleep(1000);
+                driver.FindElementById("prefsButton").Click();
+                Thread.Sleep(1000);
+                driver.FindElementByLinkText("Import save").Click();
+                var saveFile = File.ReadAllText("CookieSave.txt");
+                driver.FindElementById("textareaPrompt").SendKeys(saveFile);
+                driver.FindElementById("promptOption0").Click();
+                var numOfLoops = 0;
                 while (true)
                 {
-                    try
+                    if (numOfLoops == 100)
                     {
-                        driver.FindElementById("bigCookie").Click();
+                        try
+                        {
+                            driver.FindElementById("prefsButton").Click();
+                            Thread.Sleep(1000);
+                            driver.FindElementByLinkText("Export save").Click();
+                            var save = driver.FindElementById("textareaPrompt").Text;
+                            File.WriteAllText("CookieSave.txt", save);
+                            driver.FindElementById("promptOption0").Click();
+                            numOfLoops = 0;
+                        }
+                        catch
+                        {
+                            continue;
+                        }
                     }
-                    catch
-                    {
-                        break;
-                    }
+                    driver.FindElementById("bigCookie").Click();
                     var productNum = new Random().Next(10);
                     var productElementId = "product" + productNum;
                     try
@@ -44,9 +55,8 @@ namespace CookieClickerBot
                     {
                         continue;
                     }
-                    //var cookies = driver.Manage().Cookies.AllCookies;
-                    //var lines = cookies.Select(cookie => cookie.Domain + "," + cookie.Expiry + "," + cookie.Name + "," + cookie.Path + "," + cookie.Value).ToList();
-                    //File.WriteAllLines("Cookies.txt", lines);
+
+                    numOfLoops++;
                 }
             }
         }
