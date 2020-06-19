@@ -44,7 +44,15 @@ namespace CookieClickerBot
                             continue;
                         }
                     }
-                    driver.FindElementById("bigCookie").Click();
+
+                    try
+                    {
+                        driver.FindElementById("bigCookie").Click();
+                    }
+                    catch
+                    {
+                        break;
+                    }
                     var productNum = new Random().Next(10);
                     var productElementId = "product" + productNum;
                     try
